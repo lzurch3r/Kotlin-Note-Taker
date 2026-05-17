@@ -3,7 +3,7 @@ import java.io.Serializable
 import java.io.ObjectOutputStream
 import java.io.FileOutputStream
 import java.io.ObjectInputStream
-import java.util.Vector
+import java.time.LocalDateTime
 
 fun main(args: Array<String>) {
 
@@ -23,8 +23,8 @@ fun main(args: Array<String>) {
     println(string)*/
 
     //TEST create_note()
-    /*val newNote = create_note()
-    newNote.display()*/
+    val newNote = create_note()
+    newNote.display()
 }
 
 fun load_home_page() {
@@ -56,7 +56,7 @@ fun create_note(): Note {
     //category is optional
     val category = get_user_input("Category (optional): ")
 
-    return Note(title, description, category)
+    return Note(title, description, category, LocalDateTime.now())
 }
 
 fun cancel_action() {
@@ -73,13 +73,13 @@ fun display_set_of_notes(notes: Collection<Note>) {
     }
 }
 
-data class Note(val title: String, val description: String, val category: String): Serializable {
-    private var date = ""
+data class Note(val title: String, val description: String, val category: String, val date_time: LocalDateTime): Serializable {
 
     public fun display() {
         println("Title: $title")
         println("Description: $description")
         println("Category: $category\n")
+        println("Date and Time: $date_time")
     }
 }
 
