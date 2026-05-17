@@ -28,25 +28,32 @@ fun main(args: Array<String>) {
     newNote.display()*/
 
     //TEST reading and writing to "notes.dat"
-    load_home_page()
+    val notes: MutableCollection<Note> = load_home_page()
 
-    var option = "";
+    var option = ""
     option = get_user_input("Type a number and press Enter: ")
     while (option.length > 1) {
         println("Invalid input. Please enter a number")
         option = get_user_input("")
     }
     when (option.toByteOrNull()) {
-        1.toByte() -> create_note()
+        1.toByte() -> {
+            val newNote = create_note()
+            notes.add(newNote)
+
+            save_to_file(notes, "notes.dat")
+            println("Note saved!")
+            display_set_of_notes(notes)
+        }
         2.toByte(), 3.toByte(), 4.toByte() -> println("Not implemented yet")
         else -> println("Invalid option")
     }
 }
 
-fun load_home_page() {
+fun load_home_page(): MutableCollection<Note> {
     val path = "notes.dat"
     val notesFile = File(path)
-    var notes: MutableCollection<Note> = mutableSetOf()
+    var notes: MutableCollection<Note> = mutableSetOf<Note>()
 
     if (!notesFile.exists()) {
         println("You have no notes!")
@@ -54,6 +61,7 @@ fun load_home_page() {
 
     else if (notesFile.exists()) {
         notes = load_from_file("notes.dat")
+        println("Notes list:\n")
         display_set_of_notes(notes)
     }
 
@@ -62,6 +70,8 @@ fun load_home_page() {
     println("2. Delete existing note")
     println("3. Add existing note to category")
     println("4. Sort notes")
+
+    return notes
 }
 
 fun get_user_input(prompt: String): String {
@@ -100,8 +110,12 @@ fun get_category() {
 }
 
 fun display_set_of_notes(notes: Collection<Note>) {
+    var count: Int = 1
     for (note in notes) {
+        print("$count. ")
         note.display()
+        println("")
+        count++
     }
 }
 
@@ -109,9 +123,9 @@ data class Note(val title: String, val description: String, val category: String
 
     public fun display() {
         println("Title: $title")
-        println("Description: $description")
-        println("Category: $category\n")
-        println("Date and Time: $date_time")
+        println("   Description: $description")
+        println("   Category: $category")
+        println("   Date and Time: $date_time")
     }
 }
 
