@@ -17,6 +17,14 @@ fun main(args: Array<String>) {
     save_to_file(notes, "notes.dat")
     notes.display()
     display_set_of_notes(load_from_file("notes.dat"))*/
+
+    //TEST USER INPUT
+    /*val string = get_user_input("Please type anything: ")
+    println(string)*/
+
+    //TEST create_note()
+    /*val newNote = create_note()
+    newNote.display()*/
 }
 
 fun load_home_page() {
@@ -24,16 +32,31 @@ fun load_home_page() {
     val notes = ""
 }
 
-fun get_user_input() {
-
+fun get_user_input(prompt: String): String {
+    print(prompt)
+    return readln()
 }
 
 fun load_create_note_page() {
 
 }
 
-fun create_note() {
+fun create_note(): Note {
+    println("Let's create a note!")
+    var title: String = get_user_input("Title: ")
+    while (title.trim().isEmpty()) {
+        println("Title cannot be empty!")
+        title = get_user_input("Title: ")
+    }
+    var description: String = get_user_input("Description: ")
+    while (description.trim().isEmpty()) {
+        println("Description cannot be empty!")
+        description = get_user_input("Description: ")
+    }
+    //category is optional
+    val category = get_user_input("Category (optional): ")
 
+    return Note(title, description, category)
 }
 
 fun cancel_action() {
