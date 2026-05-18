@@ -7,11 +7,12 @@ import java.time.LocalDateTime
 import java.io.File
 
 fun main(args: Array<String>) {
+    //If there are notes, loads display of note collection and menu options
     val notes: MutableCollection<Note> = load_home_page()
 
     var option = ""
     option = get_user_input("Type a number and press Enter: ")
-    while (option.length > 1) {
+    while (option.length != 1) {
         println("Invalid input. Please enter a number")
         option = get_user_input("")
     }
@@ -24,15 +25,25 @@ fun main(args: Array<String>) {
             println("Note saved!")
             display_set_of_notes(notes)
         }
-        2.toByte() -> {
+        2.toByte() if (notes.isNotEmpty()) -> {
             var noteNum = get_user_input("Type the number of the note you want to delete: ")
             println("You typed: $noteNum")
-            while (noteNum.toInt() > get_collection_length(notes) || noteNum.toInt() <= 0) {
+            while (noteNum.toInt() > notes.size || noteNum.toInt() <= 0) {
                 print("Note doesn't exist. Please enter a number within range: ")
                 noteNum = get_user_input("")
             }
+            println("Deleting note $noteNum...")
+            notes.remove(notes.elementAt(noteNum.toInt() - 1))
+
+            save_to_file(notes, "notes.dat")
+            println("Note deleted!")
+            display_set_of_notes(notes)
         }
         3.toByte(), 4.toByte() -> println("Not implemented yet")
+        5.toByte() -> {
+            println("Exiting note-taking program...")
+            println("See you!")
+        }
         else -> println("Invalid option")
     }
 }
@@ -40,7 +51,7 @@ fun main(args: Array<String>) {
 fun load_home_page(): MutableCollection<Note> {
     val path = "notes.dat"
     val notesFile = File(path)
-    var notes: MutableCollection<Note> = mutableSetOf<Note>()
+    var notes: MutableCollection<Note> = mutableListOf<Note>()
 
     if (!notesFile.exists()) {
         println("You have no notes!")
@@ -54,9 +65,12 @@ fun load_home_page(): MutableCollection<Note> {
 
     println("MAIN MENU")
     println("1. Create new note")
-    println("2. Delete existing note")
-    println("3. Link category to existing note")
-    println("4. Sort notes")
+    if (notes.isNotEmpty()) {
+        println("2. Delete existing note")
+        println("3. Link category to existing note")
+        println("4. Sort notes")
+    }
+    println("5. Exit program")
 
     return notes
 }
