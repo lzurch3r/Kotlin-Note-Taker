@@ -9,6 +9,7 @@ import java.io.File
 fun main(args: Array<String>) {
     //If there are notes, loads display of note collection and menu options
     val notes: MutableCollection<Note> = load_home_page()
+    var sortType = 1
 
     var option = ""
     option = get_user_input("Type a number and press Enter: ")
@@ -21,9 +22,9 @@ fun main(args: Array<String>) {
             val newNote = create_note()
             notes.add(newNote)
 
-            save_to_file(notes, "notes.dat")
+            save_to_file(notes.sortedBy { it.date_time }, "notes.dat")
             println("Note saved!")
-            display_set_of_notes(notes)
+            display_set_of_notes(notes, sortType)
         }
         2.toByte() if (notes.isNotEmpty()) -> {
             var noteNum = get_user_input("Type the number of the note you want to delete: ")
@@ -37,7 +38,7 @@ fun main(args: Array<String>) {
 
             save_to_file(notes, "notes.dat")
             println("Note deleted!")
-            display_set_of_notes(notes)
+            display_set_of_notes(notes, sortType)
         }
         3.toByte(), 4.toByte() -> println("Not implemented yet")
         5.toByte() -> {
@@ -60,7 +61,7 @@ fun load_home_page(): MutableCollection<Note> {
     else if (notesFile.exists()) {
         notes = load_from_file("notes.dat")
         println("Notes list:\n")
-        display_set_of_notes(notes)
+        display_set_of_notes(notes, 1)
     }
 
     println("MAIN MENU")
@@ -97,7 +98,10 @@ fun create_note(): Note {
         description = get_user_input("Description: ")
     }
     //category is optional
-    val category = get_user_input("Category (optional): ")
+    var category = get_user_input("Category (optional): ")
+    if (category.isEmpty()) {
+        category = "<none>"
+    }
 
     return Note(title, description, category, LocalDateTime.now())
 }
@@ -110,26 +114,33 @@ fun get_category() {
 
 }
 
-fun display_set_of_notes(notes: Collection<Note>) {
-    var count: Int = 1
-    for (note in notes) {
+fun display_set_of_notes(notes: Collection<Note>, sortType: Int) {
+    var localNotes = when (sortType) {
+        1 -> notes.sortedByDescending { it.date_time }
+        2 -> notes.sortedByDescending { it.title }
+        3 -> notes.sortedByDescending { it.category }
+        else -> notes.sortedByDescending { it.date_time }
+    }
+    var count = 1
+    for (note in localNotes) {
         print("$count. ")
         note.display()
         println("")
         count++
     }
+
 }
 
 fun get_collection_length(notes: MutableCollection<Note>): Int {
-    var count: Int = 0
+    var count = 0
     for (note in notes) {
         count++
     }
     return count
 }
 
-data class Note(val title: String, val description: String, val category: String, val date_time: LocalDateTime): Serializable {
-    public fun display() {
+data class Note(val title: String, val description: String, var category: String, val date_time: LocalDateTime): Serializable {
+    fun display() {
         println("Title: $title")
         println("   Description: $description")
         println("   Category: $category")
@@ -145,6 +156,7 @@ fun save_to_file(notes: Collection<Note>, path: String) {
 
 fun load_from_file(path: String): MutableCollection<Note> {
     return ObjectInputStream(FileInputStream(path)).use { input ->
-        input.readObject() as MutableCollection<Note>
+        val loaded = input.readObject() as Collection<Note>
+        mutableListOf<Note>().apply { addAll(loaded) }
     }
 }
