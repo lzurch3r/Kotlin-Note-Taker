@@ -7,27 +7,6 @@ import java.time.LocalDateTime
 import java.io.File
 
 fun main(args: Array<String>) {
-
-    //TEST NOTE, Save to file
-    /*val newNote = Note("New Note", "Description here", "No category")
-    val newNote2 = Note("Insert note here", "Insert desc here", "Insert category here")
-
-    var notes = mutableSetOf<Note>(newNote)
-    notes.add(newNote2)
-
-    save_to_file(notes, "notes.dat")
-    notes.display()
-    display_set_of_notes(load_from_file("notes.dat"))*/
-
-    //TEST USER INPUT
-    /*val string = get_user_input("Please type anything: ")
-    println(string)*/
-
-    //TEST create_note()
-    /*val newNote = create_note()
-    newNote.display()*/
-
-    //TEST reading and writing to "notes.dat"
     val notes: MutableCollection<Note> = load_home_page()
 
     var option = ""
@@ -45,7 +24,15 @@ fun main(args: Array<String>) {
             println("Note saved!")
             display_set_of_notes(notes)
         }
-        2.toByte(), 3.toByte(), 4.toByte() -> println("Not implemented yet")
+        2.toByte() -> {
+            var noteNum = get_user_input("Type the number of the note you want to delete: ")
+            println("You typed: $noteNum")
+            while (noteNum.toInt() > get_collection_length(notes) || noteNum.toInt() <= 0) {
+                print("Note doesn't exist. Please enter a number within range: ")
+                noteNum = get_user_input("")
+            }
+        }
+        3.toByte(), 4.toByte() -> println("Not implemented yet")
         else -> println("Invalid option")
     }
 }
@@ -68,7 +55,7 @@ fun load_home_page(): MutableCollection<Note> {
     println("MAIN MENU")
     println("1. Create new note")
     println("2. Delete existing note")
-    println("3. Add existing note to category")
+    println("3. Link category to existing note")
     println("4. Sort notes")
 
     return notes
@@ -119,8 +106,15 @@ fun display_set_of_notes(notes: Collection<Note>) {
     }
 }
 
-data class Note(val title: String, val description: String, val category: String, val date_time: LocalDateTime): Serializable {
+fun get_collection_length(notes: MutableCollection<Note>): Int {
+    var count: Int = 0
+    for (note in notes) {
+        count++
+    }
+    return count
+}
 
+data class Note(val title: String, val description: String, val category: String, val date_time: LocalDateTime): Serializable {
     public fun display() {
         println("Title: $title")
         println("   Description: $description")
