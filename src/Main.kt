@@ -18,48 +18,28 @@ fun main(args: Array<String>) {
         option = getUserInput("")
     }
     when (option.toByteOrNull()) {
-        1.toByte() -> {
-            loadCreateNotePage(notes, sortType)
-//            val newNote = create_note()
-//            notes.add(newNote)
-//
-//            save_to_file(notes.sortedBy { it.date_time }, "notes.dat")
-//            println("Note saved!")
-//            display_set_of_notes(notes, sortType)
-        }
-        2.toByte() if (notes.isNotEmpty()) -> {
-            var noteNum = getUserInput("Type the number of the note you want to delete: ")
-            println("You typed: $noteNum")
-            while (noteNum.toInt() > notes.size || noteNum.toInt() <= 0) {
-                print("Note doesn't exist. Please enter a number within range: ")
-                noteNum = getUserInput("")
-            }
-            println("Deleting note $noteNum...")
-            notes.remove(notes.elementAt(noteNum.toInt() - 1))
-
-            saveToFile(notes, "notes.dat")
-            println("Note deleted!")
-            displaySetOfNotes(notes, sortType)
-        }
+        1.toByte() -> { loadCreateNotePage(notes, sortType) }
+        2.toByte() if (notes.isNotEmpty()) -> { loadDeleteNotePage(notes, sortType) }
         3.toByte() -> println("Not implemented yet")
         4.toByte() -> {
-            var count = 0
-            println("Note sorting options:")
-            count++
-            println("$count. Most recent first")
-            count++
-            println("$count. Alphabetical order (by title)")
-            count++
-            println("$count. Alphabetical order (by category)")
-            option = getUserInput("Enter your preferred method of sorting: ")
-
-            while (option.length != 1 && (option.toIntOrNull() !in 1..count)) {
-                option = getUserInput("Invalid option. Please enter a number within range: ")
-            }
-
-            sortType = option.toInt()
-
-            displaySetOfNotes(notes, sortType)
+            sortType = loadSortNotePage(notes)
+//            var count = 0
+//            println("Note sorting options:")
+//            count++
+//            println("$count. Most recent first")
+//            count++
+//            println("$count. Alphabetical order (by title)")
+//            count++
+//            println("$count. Alphabetical order (by category)")
+//            option = getUserInput("Enter your preferred method of sorting: ")
+//
+//            while (option.length != 1 && (option.toIntOrNull() !in 1..count)) {
+//                option = getUserInput("Invalid option. Please enter a number within range: ")
+//            }
+//
+//            sortType = option.toInt()
+//
+//            displaySetOfNotes(notes, sortType)
         }
         5.toByte() -> {
             println("Exiting note-taking program...")
@@ -110,6 +90,43 @@ fun loadCreateNotePage(notes: MutableCollection<Note>, sortType: Int) {
     displaySetOfNotes(notes, sortType)
 }
 
+fun loadDeleteNotePage(notes: MutableCollection<Note>, sortType: Int) {
+    var noteNum = getUserInput("Type the number of the note you want to delete: ")
+    println("You typed: $noteNum")
+    while (noteNum.toInt() > notes.size || noteNum.toInt() <= 0) {
+        print("Note doesn't exist. Please enter a number within range: ")
+        noteNum = getUserInput("")
+    }
+    println("Deleting note $noteNum...")
+
+    notes.remove(notes.elementAt(noteNum.toInt() - 1))
+
+    saveToFile(notes, "notes.dat")
+    println("Note deleted!")
+    displaySetOfNotes(notes, sortType)
+}
+
+fun loadSortNotePage(notes: MutableCollection<Note>): Int {
+    var count = 0
+    println("Note sorting options:")
+    count++
+    println("$count. Most recent first")
+    count++
+    println("$count. Alphabetical order (by title)")
+    count++
+    println("$count. Alphabetical order (by category)")
+    var option = getUserInput("Enter a method of sorting: ")
+
+    while (option.length != 1 && (option.toIntOrNull() !in 1..count)) {
+        option = getUserInput("Invalid option. Please enter a number within range: ")
+    }
+
+    val sortType = option.toInt()
+
+    displaySetOfNotes(notes, sortType)
+    return sortType
+}
+
 fun createNote(): Note {
     println("Let's create a note!")
     var title: String = getUserInput("Title: ")
@@ -124,19 +141,11 @@ fun createNote(): Note {
     }
     //category is optional
     var category = getUserInput("Category (optional): ")
-    if (category.isEmpty()) {
+    /*if (category.isEmpty()) {
         category = "<none>"
-    }
+    }*/
 
     return Note(title, description, category, LocalDateTime.now())
-}
-
-fun cancel_action() {
-
-}
-
-fun get_category() {
-
 }
 
 fun displaySetOfNotes(notes: Collection<Note>, sortType: Int) {
@@ -156,19 +165,14 @@ fun displaySetOfNotes(notes: Collection<Note>, sortType: Int) {
 
 }
 
-fun getCollectionLength(notes: MutableCollection<Note>): Int {
-    var count = 0
-    for (note in notes) {
-        count++
-    }
-    return count
-}
-
 data class Note(val title: String, val description: String, var category: String, val date_time: LocalDateTime): Serializable {
     fun display() {
         println("Title: $title")
         println("   Description: $description")
-        println("   Category: $category")
+        if (category.isEmpty()) {
+            println("   Category: <none>")
+        }
+        else println("   Category: $category")
         println("   Date and Time: $date_time")
     }
 }
