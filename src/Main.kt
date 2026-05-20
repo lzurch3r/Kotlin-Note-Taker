@@ -23,23 +23,6 @@ fun main(args: Array<String>) {
         3.toByte() -> println("Not implemented yet")
         4.toByte() -> {
             sortType = loadSortNotePage(notes)
-//            var count = 0
-//            println("Note sorting options:")
-//            count++
-//            println("$count. Most recent first")
-//            count++
-//            println("$count. Alphabetical order (by title)")
-//            count++
-//            println("$count. Alphabetical order (by category)")
-//            option = getUserInput("Enter your preferred method of sorting: ")
-//
-//            while (option.length != 1 && (option.toIntOrNull() !in 1..count)) {
-//                option = getUserInput("Invalid option. Please enter a number within range: ")
-//            }
-//
-//            sortType = option.toInt()
-//
-//            displaySetOfNotes(notes, sortType)
         }
         5.toByte() -> {
             println("Exiting note-taking program...")
@@ -141,9 +124,6 @@ fun createNote(): Note {
     }
     //category is optional
     var category = getUserInput("Category (optional): ")
-    /*if (category.isEmpty()) {
-        category = "<none>"
-    }*/
 
     return Note(title, description, category, LocalDateTime.now())
 }
